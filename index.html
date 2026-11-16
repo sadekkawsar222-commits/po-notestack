@@ -187,6 +187,28 @@ body.night #ink{color:#fff;opacity:.08;mix-blend-mode:screen}
 body.typing .bar,body.typing #meta,body.typing #fmt{opacity:0!important;pointer-events:none}
 #ed>*{transition:opacity .35s ease}
 body.typing #ed>*:not(.now),body.focus #ed>*:not(.now){opacity:.32}
+.doc img{max-width:100%;height:auto;border-radius:2px;cursor:pointer}.doc img.on{outline:2px solid #8a3b2e;outline-offset:2px}
+.doc hr.pb{border:0;border-top:2px dashed currentColor;opacity:.35;margin:1.6em 0;position:relative;overflow:visible}.doc hr.pb::after{content:'page break';position:absolute;left:50%;top:-.7em;transform:translateX(-50%);font-size:.65em;background:var(--bg);padding:0 .5em}
+.doc table.sheet{counter-reset:row;margin:1.7em 0 .9em 2em;width:calc(100% - 2em);font-variant-numeric:tabular-nums}
+.doc table.sheet tr{counter-increment:row;counter-reset:col}
+.doc table.sheet td,.doc table.sheet th{position:relative;counter-increment:col;text-align:right;border-color:rgba(0,0,0,.28)}
+.doc table.sheet tr>:first-child{text-align:left}
+.doc table.sheet tr:first-child>::before{content:counter(col,upper-alpha);position:absolute;top:-1.55em;left:0;right:0;text-align:center;font-size:.68em;opacity:.5;pointer-events:none;user-select:none;font-weight:400}
+.doc table.sheet tr>:first-child::after{content:counter(row);position:absolute;left:-2.4em;top:.35em;width:2em;text-align:right;font-size:.68em;opacity:.5;pointer-events:none;user-select:none;font-weight:400}
+.doc table.sheet [data-f]{background:rgba(138,59,46,.07)}
+#fmt{flex-wrap:wrap;justify-content:center;max-width:min(880px,calc(100vw - 24px));overflow:visible}
+#fmt select{flex:none;background:none;border:1px solid var(--line);color:var(--ink);font:inherit;font-size:12px;padding:3px 2px;border-radius:3px;cursor:pointer;max-width:92px}
+#fmt select option{background:var(--panel);color:var(--ink)}
+#ctx,#findp{position:fixed;left:50%;transform:translateX(-50%);z-index:7;display:flex;gap:2px;align-items:center;flex-wrap:wrap;max-width:calc(100vw - 20px);background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px;box-shadow:0 6px 24px rgba(0,0,0,.18);font:12px var(--font)}
+#ctx[hidden],#findp[hidden],#ctx [hidden]{display:none!important}
+#ctx span{display:flex;gap:2px;align-items:center;flex-wrap:wrap}
+#ctx button,#findp button{background:none;border:0;color:var(--ink);padding:5px 7px;border-radius:3px;cursor:pointer;font:inherit}
+#ctx button:hover,#findp button:hover{background:var(--line)}
+#cName{min-width:2.4em;text-align:center;opacity:.7}
+#ctx input,#findp input:not([type]){background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:4px 6px;font:inherit;width:170px}
+#findp{top:calc(52px + env(safe-area-inset-top))}#findp label{display:flex;align-items:center;gap:2px;padding:0 4px}#fN{min-width:4em;opacity:.7;text-align:center}
+body.night .doc table.sheet td,body.night .doc table.sheet th{border-color:rgba(255,255,255,.35)}
+body.typing #ctx{opacity:.35}body.focus #ctx,body.reading #ctx,body.reading #findp{display:none!important}
 </style>
 </head>
 <body class="cc">
@@ -309,6 +331,7 @@ body.typing #ed>*:not(.now),body.focus #ed>*:not(.now){opacity:.32}
 <script src="vendor/turndown.js"></script>
 <script src="vendor/turndown-plugin-gfm.js"></script>
 <script src="app.js"></script>
+<script src="office.js"></script>
 <script src="bangla.js"></script>
 <script src="typefx.js"></script>
 <script src="insights.js"></script>
