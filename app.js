@@ -27,7 +27,7 @@ function applyS(){const r=document.documentElement.style;
   curEl.className='c-'+S.cursor+(S.blink?' blink':'');
   document.querySelectorAll('[data-k]').forEach(i=>{const v=S[i.dataset.k];i.type==='checkbox'?i.checked=v:i.value=v});
   document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('on',b.dataset.theme===S.theme));
-  if(!document.body.classList.contains('reading'))ls.set('settings8',S);requestAnimationFrame(()=>{tws();drawCursor()})}
+  document.body.classList.toggle('notws',!S.tws);if(!document.body.classList.contains('reading'))ls.set('settings8',S);requestAnimationFrame(()=>{tws();drawCursor()})}
 document.querySelectorAll('[data-k]').forEach(i=>i.addEventListener('input',()=>{const k=i.dataset.k;S[k]=i.type==='checkbox'?i.checked:i.type==='range'?+i.value:i.value;applyS()}));
 document.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>{S={...S,theme:b.dataset.theme,...THEMES[b.dataset.theme]};applyS()});
 $('#lamp').onclick=e=>{e.stopPropagation();S.on=!S.on;applyS();ed.focus()};
@@ -66,7 +66,7 @@ function moveLamp(b){const x=Math.max(30,Math.min(innerWidth-30,b.left));
   const y=Math.round(S.tws&&!document.body.classList.contains('reading')?stage.getBoundingClientRect().top+stage.clientHeight*S.vpos+b.height/2+Math.max(16,S.size):b.top+b.height+3);
   moveLamp.done=b.top!==undefined&&!b.idle;const X=Math.round(x);if(X===moveLamp.x&&y===moveLamp.y)return;moveLamp.x=X;moveLamp.y=y;
   for(const el of LAMPV){el.style.setProperty('--lx',X+'px');el.style.setProperty('--ly',y+'px')}GLOWW.style.transform=`translate3d(${X}px,${y-6}px,0)`}
-const LAMPV=[$('#scene'),$('#rail')],GLOWW=$('#glowW');
+const LAMPV=[$('#scene'),$('#rail'),$('#stage')],GLOWW=$('#glowW');
 function placeIdle(){const c=ed.getBoundingClientRect(),cs=getComputedStyle(ed),h=S.size*1.15,p=ed.querySelector('p,h1,h2,h3,li,div');const l=p?p.getBoundingClientRect().left:c.left+parseFloat(cs.paddingLeft);moveLamp({left:l,top:stage.clientHeight*S.vpos-h/2,height:h,idle:1})}
 let dcF=0;function drawCursor(){if(!dcF)dcF=requestAnimationFrame(()=>{dcF=0;drawCursorNow()})}
 function drawCursorNow(){const s=getSelection();
