@@ -62,7 +62,7 @@ function caretRect(){const s=getSelection();if(!s.rangeCount||!ed.contains(s.anc
   return{left,top:c.top+(n===ed?pt:pt),height:lh}}
 function tws(){if(!S.tws)return;const b=caretRect();if(!b)return;stage.scrollTop+=b.top+b.height/2-stage.clientHeight*S.vpos}
 function moveLamp(b){const x=Math.max(30,Math.min(innerWidth-30,b.left)),y=b.top+b.height+3,r=document.documentElement.style;
-  r.setProperty('--lx',x+'px');r.setProperty('--ly',y+'px');r.setProperty('--tilt',((innerWidth/2-x)/innerWidth*38).toFixed(1)+'deg');$('#glowW').style.transform=`translate(${x}px,${y}px)`}
+  r.setProperty('--lx',x+'px');r.setProperty('--ly',y+'px');$('#glowW').style.transform=`translate(${x}px,${y}px)`}
 function drawCursor(){const s=getSelection();
   const b=s.rangeCount&&s.isCollapsed?caretRect():null;if(b)moveLamp(b);
   if(S.cursor==='native'||document.activeElement!==ed||!b){curEl.hidden=true;return}
