@@ -22,11 +22,11 @@ button,input,select{font:inherit;color:inherit}
 #scene{position:fixed;inset:0;pointer-events:none;z-index:0}
 #glowW{position:absolute;left:var(--lx,50%);top:calc(var(--ly,72vh) - 6px);width:0;height:0}
 #glow{position:absolute;left:-1000px;top:-1000px;width:2000px;height:2000px;mix-blend-mode:screen;transition:opacity .9s ease;filter:blur(2px);clip-path:inset(0 0 50% 0);
-  background:conic-gradient(from -36deg at 50% 50%,transparent 0deg,rgba(255,236,196,.55) 4deg,rgba(255,240,206,.9) 10deg,#ffeac4 24deg,#ffeac4 48deg,rgba(255,240,206,.9) 62deg,rgba(255,236,196,.55) 68deg,transparent 72deg,transparent 360deg);
+  background:conic-gradient(from -36deg at 50% 50%,transparent 0deg,rgba(255,236,196,.55) 4deg,rgba(255,240,206,.9) 10deg,#ffe8bf 24deg,#ffe8bf 48deg,rgba(255,240,206,.9) 62deg,rgba(255,236,196,.55) 68deg,transparent 72deg,transparent 360deg);
   -webkit-mask-image:radial-gradient(circle min(92vh,860px) at 50% 50%,#000 0,#000 6%,rgba(0,0,0,.86) 18%,rgba(0,0,0,.64) 34%,rgba(0,0,0,.42) 52%,rgba(0,0,0,.22) 70%,rgba(0,0,0,.08) 86%,transparent 100%);mask-image:radial-gradient(circle min(92vh,860px) at 50% 50%,#000 0,#000 6%,rgba(0,0,0,.86) 18%,rgba(0,0,0,.64) 34%,rgba(0,0,0,.42) 52%,rgba(0,0,0,.22) 70%,rgba(0,0,0,.08) 86%,transparent 100%)}
 #vig{position:absolute;inset:0;mix-blend-mode:multiply;transition:opacity .9s;
   background:linear-gradient(180deg,rgba(84,92,112,.56) 0,rgba(92,100,120,.5) calc(var(--ly,72%) - 1px),rgba(90,98,118,.52) calc(var(--ly,72%) + 3px),rgba(80,88,106,.58) 100%)}
-#vig::after{content:'';position:absolute;inset:0;opacity:.65;transition:opacity 1.2s ease;background:linear-gradient(90deg,rgba(36,40,52,.62) 0,rgba(60,66,80,.3) 14%,rgba(255,255,255,0) 30%,rgba(255,255,255,0) 70%,rgba(60,66,80,.3) 86%,rgba(36,40,52,.62) 100%),radial-gradient(ellipse 100% 95% at 50% 60%,rgba(255,255,255,0) 42%,rgba(64,70,86,.5) 76%,rgba(32,36,48,.88) 100%)}
+#vig::after{content:'';position:absolute;inset:0;opacity:.65;transition:opacity 1.2s ease;background:linear-gradient(90deg,rgba(36,40,52,.62) 0,rgba(60,66,80,.3) 14%,rgba(255,255,255,0) 30%,rgba(255,255,255,0) 70%,rgba(60,66,80,.3) 86%,rgba(36,40,52,.62) 100%),radial-gradient(ellipse 100% 95% at 50% 60%,rgba(255,255,255,0) 42%,rgba(64,70,86,.5) 76%,rgba(32,36,48,.88) 100%);-webkit-mask-image:conic-gradient(from -37deg at var(--lx,50%) calc(var(--ly,72vh) - 6px),#000 0deg,transparent 6deg,transparent 68deg,#000 74deg,#000 360deg);mask-image:conic-gradient(from -37deg at var(--lx,50%) calc(var(--ly,72vh) - 6px),#000 0deg,transparent 6deg,transparent 68deg,#000 74deg,#000 360deg)}
 body.typing #vig::after{opacity:1}
 body:not(.night) #lamp:not(.x){box-shadow:0 1px 2px rgba(0,0,0,.35)}
 body:not(.lit) #glow{opacity:0}
