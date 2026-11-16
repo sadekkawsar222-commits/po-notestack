@@ -50,7 +50,8 @@ function newDoc(){if(cur&&saveT)save();cur=null;blank();$('#title').value='Untit
 $('#title').addEventListener('input',()=>{ensureDoc();cur.title=$('#title').value.trim()||'Untitled';cur.titleAuto=false;schedule()});
 $('#title').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ed.focus();caretEnd()}});
 
-function count(){const t=ed.innerText.trim();const w=t?t.split(/\s+/).length:0;$('#count').textContent=`${w} word${w==1?'':'s'} · ${t.replace(/\n/g,'').length} chars`}
+function count(){clearTimeout(count.t);count.t=setTimeout(countNow,350)}
+function countNow(){const t=ed.innerText.trim();const w=t?t.split(/\s+/).length:0;$('#count').textContent=`${w} word${w==1?'':'s'} · ${t.replace(/\n/g,'').length} chars`}
 
 /* ---------- typewriter behaviour ---------- */
 function caretRect(){const s=getSelection();if(!s.rangeCount||!ed.contains(s.anchorNode))return null;const r=s.getRangeAt(0).cloneRange();r.collapse(false);
@@ -61,9 +62,11 @@ function caretRect(){const s=getSelection();if(!s.rangeCount||!ed.contains(s.anc
   const left=cs.textAlign==='center'?c.left+c.width/2:cs.textAlign==='right'?c.right:c.left+(n===ed?pl:pl);
   const fs=parseFloat(cs.fontSize)||S.size,gh=fs*1.15;return{left,top:c.top+pt+(lh-gh)/2,height:gh}}
 function tws(){if(!S.tws)return;const b=caretRect();if(!b)return;stage.scrollTop+=b.top+b.height/2-stage.clientHeight*S.vpos}
-function moveLamp(b){const x=Math.max(30,Math.min(innerWidth-30,b.left)),r=document.documentElement.style;
+function moveLamp(b){const x=Math.max(30,Math.min(innerWidth-30,b.left));
   const y=Math.round(S.tws&&!document.body.classList.contains('reading')?stage.getBoundingClientRect().top+stage.clientHeight*S.vpos+b.height/2+Math.max(16,S.size):b.top+b.height+3);
-  moveLamp.done=b.top!==undefined&&!b.idle;r.setProperty('--lx',x+'px');r.setProperty('--ly',y+'px')}
+  moveLamp.done=b.top!==undefined&&!b.idle;const X=Math.round(x);if(X===moveLamp.x&&y===moveLamp.y)return;moveLamp.x=X;moveLamp.y=y;
+  for(const el of LAMPV){el.style.setProperty('--lx',X+'px');el.style.setProperty('--ly',y+'px')}GLOWW.style.transform=`translate3d(${X}px,${y-6}px,0)`}
+const LAMPV=[$('#scene'),$('#rail')],GLOWW=$('#glowW');
 function placeIdle(){const c=ed.getBoundingClientRect(),cs=getComputedStyle(ed),h=S.size*1.15,p=ed.querySelector('p,h1,h2,h3,li,div');const l=p?p.getBoundingClientRect().left:c.left+parseFloat(cs.paddingLeft);moveLamp({left:l,top:stage.clientHeight*S.vpos-h/2,height:h,idle:1})}
 function drawCursor(){const s=getSelection();
   const b=s.rangeCount&&s.isCollapsed?caretRect():null;if(b)moveLamp(b);else if(!moveLamp.done)placeIdle();

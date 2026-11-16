@@ -6,7 +6,9 @@
   let lastCount = words(ed.innerText).length, lastDoc = null;
   const sess = { start: 0, active: 0, typed: 0, lastKey: 0 };
 
-  ed.addEventListener('input', () => {
+  let wT;
+  ed.addEventListener('input', () => { clearTimeout(wT); wT = setTimeout(tally, 700); });
+  function tally() {
     const n = words(ed.innerText).length, id = cur && cur.id;
     if (id === lastDoc) { const d = n - lastCount; if (d > 0) { log[today()] = (log[today()] || 0) + d; sess.typed += d; ls.set('daylog', log); } }
     lastDoc = id; lastCount = n;
@@ -14,7 +16,7 @@
     if (!sess.start) sess.start = now;
     if (sess.lastKey && now - sess.lastKey < 15000) sess.active += now - sess.lastKey;
     sess.lastKey = now;
-  });
+  }
   // re-baseline when a different document is opened
   setInterval(() => { const id = cur && cur.id; if (id !== lastDoc) { lastDoc = id; lastCount = words(ed.innerText).length; } }, 1000);
 
