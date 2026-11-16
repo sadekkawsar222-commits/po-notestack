@@ -82,7 +82,7 @@
     else if (t === 'insertText' || t === 'insertReplacementText' || t === 'insertCompositionText') kind = e.data === ' ' ? 'space' : 'key';
     if (!kind) return;
     play(kind); buzz(kind);
-    if (kind === 'key') requestAnimationFrame(() => { strikeInk((e.data || '').slice(-1)); kick(); });
-    if (kind === 'space') kick();
+    if (kind === 'key') requestAnimationFrame(() => { strikeInk((e.data || '').slice(-1)); });
+    
   });
 })();

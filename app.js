@@ -59,9 +59,10 @@ function caretRect(){const s=getSelection();if(!s.rangeCount||!ed.contains(s.anc
   if(n.nodeType!==1)return null;const c=n.getBoundingClientRect(),cs=getComputedStyle(n);const lh=parseFloat(cs.lineHeight)||20;
   const pl=parseFloat(cs.paddingLeft)||0,pt=parseFloat(cs.paddingTop)||0;
   const left=cs.textAlign==='center'?c.left+c.width/2:cs.textAlign==='right'?c.right:c.left+(n===ed?pl:pl);
-  return{left,top:c.top+(n===ed?pt:pt),height:lh}}
+  const fs=parseFloat(cs.fontSize)||S.size,gh=fs*1.15;return{left,top:c.top+pt+(lh-gh)/2,height:gh}}
 function tws(){if(!S.tws)return;const b=caretRect();if(!b)return;stage.scrollTop+=b.top+b.height/2-stage.clientHeight*S.vpos}
-function moveLamp(b){const x=Math.max(30,Math.min(innerWidth-30,b.left)),y=b.top+b.height+3,r=document.documentElement.style;
+function moveLamp(b){const x=Math.max(30,Math.min(innerWidth-30,b.left)),r=document.documentElement.style;
+  const y=Math.round(S.tws&&!document.body.classList.contains('reading')?stage.getBoundingClientRect().top+stage.clientHeight*S.vpos+b.height/2+3:b.top+b.height+3);
   r.setProperty('--lx',x+'px');r.setProperty('--ly',y+'px');$('#glowW').style.transform=`translate(${x}px,${y}px)`}
 function drawCursor(){const s=getSelection();
   const b=s.rangeCount&&s.isCollapsed?caretRect():null;if(b)moveLamp(b);
@@ -87,6 +88,9 @@ ed.addEventListener('paste',e=>{e.preventDefault();const cd=e.clipboardData,h=cd
 stage.addEventListener('mousedown',e=>{if(e.target===stage){e.preventDefault();ed.focus();caretEnd();tws();drawCursor()}});
 stage.addEventListener('scroll',()=>drawCursor(),{passive:true});
 let lastRange=null,mx=0,my=0;
+let ptrDown=false;document.addEventListener('pointerdown',()=>ptrDown=true,true);document.addEventListener('pointerup',()=>{ptrDown=false;const s=getSelection();if(s.isCollapsed&&ed.contains(s.anchorNode))setTimeout(()=>{if(!S.tws)return;const b=caretRect();if(!b)return;const d=b.top+b.height/2-stage.clientHeight*S.vpos;if(Math.abs(d)>2)stage.scrollTo({top:stage.scrollTop+d,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'})},0)},true);
+let idleT;const wake=()=>{document.body.classList.remove('idle');clearTimeout(idleT);idleT=setTimeout(()=>document.body.classList.add('idle'),25000)};ed.addEventListener('input',wake);ed.addEventListener('focus',wake);wake();
+setTimeout(()=>document.body.classList.add('lit'),150);
 document.addEventListener('selectionchange',()=>{const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode)){lastRange=s.getRangeAt(0).cloneRange();$('#fmt').classList.toggle('sel',!s.isCollapsed)}drawCursor()});
 document.addEventListener('mousemove',e=>{if(Math.abs(e.clientX-mx)+Math.abs(e.clientY-my)>6)document.body.classList.remove('typing');mx=e.clientX;my=e.clientY});
 document.addEventListener('touchstart',e=>{if(!ed.contains(e.target))document.body.classList.remove('typing')},{passive:true});
