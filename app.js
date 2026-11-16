@@ -326,6 +326,10 @@ window.addEventListener('appinstalled',()=>{$('#bInstall').hidden=true;toast('Po
   const last=docs.find(d=>d.id===ls.get('last')&&!d.trashed&&!d.archived);
   if(last)openDoc(last);else{blank();ed.focus();caretEnd();count();requestAnimationFrame(drawCursor)}
 
-  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if('serviceWorker' in navigator){const had=!!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then(reg=>{const chk=()=>reg.update().catch(()=>{});setInterval(chk,20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk()});addEventListener('online',chk)}).catch(()=>{});
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!had||document.getElementById('upd'))return;
+      document.body.insertAdjacentHTML('beforeend','<div id="upd" role="alert" style="position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:#1d1f22;color:#f6edd8;border-radius:12px;padding:12px 14px 12px 18px;display:flex;gap:14px;align-items:center;box-shadow:0 14px 40px rgba(0,0,0,.35);font:14px var(--font)"><span>✦ A new version of Po Notestack is ready.</span><button id="updGo" style="font:inherit;background:#ffd38a;color:#1d1f22;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:700">Update now</button><button id="updX" aria-label="Later" style="font:inherit;background:none;color:#aaa;border:0;cursor:pointer">later</button></div>');
+      document.getElementById('updGo').onclick=async()=>{if(saveT||dirty)await save();location.reload()};document.getElementById('updX').onclick=()=>document.getElementById('upd').remove()})}
 })();
 window.addEventListener('hashchange',()=>location.reload());

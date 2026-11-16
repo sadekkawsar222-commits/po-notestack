@@ -1,4 +1,4 @@
-const C='tw-v19';
+const C='tw-v20';
 const SHELL=['./','index.html','app.js','office.js','bangla.js','typefx.js','insights.js','game.js','grammar.js','sync.js','manifest.webmanifest','icon-192.png','icon-512.png','vendor/purify.min.js','vendor/jszip.min.js','vendor/turndown.js','vendor/turndown-plugin-gfm.js','vendor/typo.js','vendor/supabase.js'];
 const CACHEABLE=u=>u.origin===location.origin||u.hostname==='fonts.googleapis.com'||u.hostname==='fonts.gstatic.com'||u.hostname==='cdn.jsdelivr.net';
 const EXTRA=['https://cdn.jsdelivr.net/npm/dictionary-en@4.0.0/index.aff','https://cdn.jsdelivr.net/npm/dictionary-en@4.0.0/index.dic','https://cdn.jsdelivr.net/gh/LibreOffice/dictionaries@master/bn_BD/bn_BD.dic'];
