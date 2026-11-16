@@ -110,7 +110,7 @@ document.addEventListener('keydown',e=>{
     if(i===cs.length-1){cell=c;tableOp('rowDown');return}
     place(cs[i+1]);return}
   const m=e.ctrlKey||e.metaKey,k=e.key.toLowerCase();
-  if(m&&!e.shiftKey&&(k==='f'||k==='h')&&!document.querySelector('dialog[open]')){e.preventDefault();e.stopImmediatePropagation();openFind()}
+  if(m&&!e.shiftKey&&(k==='f'||k==='h')&&!document.querySelector('dialog[open]')&&!document.body.classList.contains('reading')){e.preventDefault();e.stopImmediatePropagation();openFind()}
 },true);
 
 /* ---------- sheets ---------- */

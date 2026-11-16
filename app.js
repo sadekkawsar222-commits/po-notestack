@@ -7,7 +7,7 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 /* ---------- storage (IndexedDB) ---------- */
 const DB={db:null,
   open(){return new Promise(r=>{try{const q=indexedDB.open('typewriter',1);q.onupgradeneeded=()=>q.result.createObjectStore('docs',{keyPath:'id'});q.onsuccess=()=>{this.db=q.result;r()};q.onerror=()=>r()}catch{r()}})},
-  run(m,fn){return new Promise(r=>{if(!this.db)return r(null);const t=this.db.transaction('docs',m),q=fn(t.objectStore('docs'));t.oncomplete=()=>r(q&&q.result);t.onerror=()=>r(null)})},
+  run(m,fn){return new Promise(r=>{if(!this.db)return r(null);const t=this.db.transaction('docs',m),q=fn(t.objectStore('docs'));t.oncomplete=()=>r(q&&q.result);t.onerror=()=>r(null);t.onabort=()=>r(null)})},
   all(){return this.db?this.run('readonly',s=>s.getAll()).then(v=>v||[]):Promise.resolve(ls.get('docs',[]))},
   put(d){if(!this.db){const a=ls.get('docs',[]).filter(x=>x.id!==d.id);a.push(d);ls.set('docs',a);return Promise.resolve()}return this.run('readwrite',s=>s.put(d))},
   del(id){if(!this.db){ls.set('docs',ls.get('docs',[]).filter(x=>x.id!==id));return Promise.resolve()}return this.run('readwrite',s=>s.delete(id))}};
@@ -16,7 +16,7 @@ const DB={db:null,
 const THEMES={original:{bg:'#e7d9b8',ink:'#1f2023',op:.95,ui:'#2b2d30',panel:'#f4ead2',line:'rgba(60,40,10,.14)',lamp:true,glow:.85},
   night:{bg:'#000000',ink:'#ffffff',op:1,ui:'#ffffff',panel:'#0a0a0a',line:'rgba(255,255,255,.16)',lamp:true,glow:.3},
   paper:{bg:'#efe4c9',ink:'#26211c',op:.95,ui:'#8c8170',panel:'#f6eedb',line:'rgba(60,40,10,.13)',lamp:false,glow:1}};
-const DEF={theme:'original',...THEMES.original,font:"'Courier Prime'",size:18,lh:1.75,width:700,vpos:.7,cursor:'bar',blink:true,tws:true,on:true,check:true,bangla:false,sound:true,vol:.6,haptic:true};
+const DEF={gsug:true,ltOnline:false,theme:'original',...THEMES.original,font:"'Courier Prime'",size:18,lh:1.75,width:700,vpos:.7,cursor:'bar',blink:true,tws:true,on:true,check:true,bangla:false,sound:true,vol:.6,haptic:true};
 let S={...DEF,...ls.get('settings8',{})};
 function applyS(){const r=document.documentElement.style;
   r.setProperty('--bg',S.bg);r.setProperty('--ink',S.ink);r.setProperty('--op',S.op);r.setProperty('--ui',S.ui);r.setProperty('--panel',S.panel);r.setProperty('--line',S.line);
@@ -27,7 +27,7 @@ function applyS(){const r=document.documentElement.style;
   curEl.className='c-'+S.cursor+(S.blink?' blink':'');
   document.querySelectorAll('[data-k]').forEach(i=>{const v=S[i.dataset.k];i.type==='checkbox'?i.checked=v:i.value=v});
   document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('on',b.dataset.theme===S.theme));
-  ls.set('settings8',S);requestAnimationFrame(()=>{tws();drawCursor()})}
+  if(!document.body.classList.contains('reading'))ls.set('settings8',S);requestAnimationFrame(()=>{tws();drawCursor()})}
 document.querySelectorAll('[data-k]').forEach(i=>i.addEventListener('input',()=>{const k=i.dataset.k;S[k]=i.type==='checkbox'?i.checked:i.type==='range'?+i.value:i.value;applyS()}));
 document.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>{S={...S,theme:b.dataset.theme,...THEMES[b.dataset.theme]};applyS()});
 $('#lamp').onclick=e=>{e.stopPropagation();S.on=!S.on;applyS();ed.focus()};
@@ -41,9 +41,9 @@ function setStatus(s){$('#status').textContent=s}
 let dirty=false;
 function schedule(){dirty=true;setStatus('editing');clearTimeout(saveT);saveT=setTimeout(save,450)}
 async function save(){if(!cur||!dirty)return;clearTimeout(saveT);saveT=null;dirty=false;
-  cur.html=ed.innerHTML.replace(/ class="now"/g,'').replace(/ now"/g,'"');cur.text=ed.innerText.replace(/\n{3,}/g,'\n\n').trim();
+  ed.querySelectorAll('img.on').forEach(i=>i.classList.remove('on'));cur.html=ed.innerHTML.replace(/ class="now"/g,'').replace(/ now"/g,'"').replace(/ class=""/g,'');cur.text=ed.innerText.replace(/\n{3,}/g,'\n\n').trim();
   if(cur.titleAuto){cur.title=(cur.text.split('\n').find(l=>l.trim())||'Untitled').trim().slice(0,60);$('#title').value=cur.title}
-  cur.updated=Date.now();setStatus('saving');await DB.put(cur);setStatus('saved')}
+  cur.updated=Date.now();setStatus('saving');const ok=await DB.put(cur).then(v=>v!==null,()=>false);setStatus(ok?'saved':'not saved');if(!ok)toast('Could not save: device storage is full. Export your work.')}
 function openDoc(d){if(cur&&saveT)save();cur=d;ed.innerHTML=d.html||'<p><br></p>';$('#title').value=d.title;ls.set('last',d.id);setStatus('saved');count();
   ed.focus();caretEnd();setTimeout(()=>{ed.focus();caretEnd();stage.scrollTop=stage.scrollHeight;tws();drawCursor()},60)}
 function newDoc(){if(cur&&saveT)save();cur=null;blank();$('#title').value='Untitled';setStatus('new');count();ed.focus();caretEnd();stage.scrollTop=0;requestAnimationFrame(drawCursor)}
@@ -68,17 +68,18 @@ function moveLamp(b){const x=Math.max(30,Math.min(innerWidth-30,b.left));
   for(const el of LAMPV){el.style.setProperty('--lx',X+'px');el.style.setProperty('--ly',y+'px')}GLOWW.style.transform=`translate3d(${X}px,${y-6}px,0)`}
 const LAMPV=[$('#scene'),$('#rail')],GLOWW=$('#glowW');
 function placeIdle(){const c=ed.getBoundingClientRect(),cs=getComputedStyle(ed),h=S.size*1.15,p=ed.querySelector('p,h1,h2,h3,li,div');const l=p?p.getBoundingClientRect().left:c.left+parseFloat(cs.paddingLeft);moveLamp({left:l,top:stage.clientHeight*S.vpos-h/2,height:h,idle:1})}
-function drawCursor(){const s=getSelection();
+let dcF=0;function drawCursor(){if(!dcF)dcF=requestAnimationFrame(()=>{dcF=0;drawCursorNow()})}
+function drawCursorNow(){const s=getSelection();
   const b=s.rangeCount&&s.isCollapsed?caretRect():null;if(b)moveLamp(b);else if(!moveLamp.done)placeIdle();
   if(S.cursor==='native'||document.activeElement!==ed||!b){curEl.hidden=true;return}
-  const fs=parseFloat(getComputedStyle(s.anchorNode.nodeType===3?s.anchorNode.parentNode:s.anchorNode).fontSize)||S.size;
+  const fs=b.height?b.height/1.13:S.size;
   const h=fs*1.15,mid=b.top+b.height/2;curEl.hidden=false;curEl.style.left=b.left+'px';
   if(S.cursor==='under'){curEl.style.top=(mid+h/2-2)+'px';curEl.style.height='2px'}else{curEl.style.top=(mid-h/2)+'px';curEl.style.height=h+'px'}
   curEl.style.fontSize=fs+'px'}
 function solidCursor(){curEl.classList.remove('blink');clearTimeout(solidCursor.t);if(S.blink)solidCursor.t=setTimeout(()=>curEl.classList.add('blink'),550)}
 function caretEnd(){const r=document.createRange();r.selectNodeContents(ed);r.collapse(false);const s=getSelection();s.removeAllRanges();s.addRange(r)}
 
-ed.addEventListener('input',()=>{if(!ed.firstElementChild)blank();ensureDoc();schedule();count();requestAnimationFrame(()=>{tws();drawCursor()});solidCursor()});
+ed.addEventListener('input',()=>{if(!ed.firstElementChild)blank();ensureDoc();schedule();count();requestAnimationFrame(()=>{tws();drawCursorNow()});solidCursor()});
 ed.addEventListener('keydown',e=>{
   if(e.key==='Tab'){e.preventDefault();document.execCommand('insertText',false,'    ')}
   if(!e.ctrlKey&&!e.metaKey&&e.key.length===1)document.body.classList.add('typing');
@@ -171,15 +172,15 @@ async function act(a,d,el){
   if(a==='dup'){const c={...d,id:uid(),title:d.title+' (copy)',titleAuto:false,created:Date.now(),updated:Date.now(),fav:false};docs.push(c);await DB.put(c);toast('Duplicated');return renderLib()}
   if(a==='move')d.folder=el.value;
   if(a==='archive')d.archived=!d.archived;
-  if(a==='trash'){d.trashed=true;if(cur===d){cur=null;newDoc()}toast('Moved to Trash')}
-  if(a==='restore')d.trashed=false;
+  if(a==='trash'){d.trashed=true;d.trashedAt=Date.now();if(cur===d){cur=null;newDoc()}toast('Moved to Trash')}
+  if(a==='restore'){d.trashed=false;delete d.trashedAt}
   if(a==='purge'){if(!confirm(`Delete “${d.title}” forever? This cannot be undone.`))return;docs=docs.filter(x=>x!==d);await DB.del(d.id);return renderLib()}
   if(cur===d&&saveT)await save(); await DB.put(d);renderLib()}
 $('#list').addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t||t.tagName==='SELECT')return;const d=docs.find(x=>x.id===t.closest('.item').dataset.id);act(t.dataset.a,d,t)});
 $('#list').addEventListener('change',e=>{if(e.target.dataset.a==='move'){const d=docs.find(x=>x.id===e.target.closest('.item').dataset.id);act('move',d,e.target)}});
 
 /* ---------- export ---------- */
-const fname=()=>((cur&&cur.title)||$('#title').value||'Untitled').replace(/[\\/:*?"<>|]+/g,'').trim().slice(0,80)||'Untitled';
+const fname=()=>((cur&&cur.title)||$('#title').value||'Untitled').replace(/[\\/:*?"<>|]+/g,'').trim().slice(0,80).replace(/[.\s]+$/,'')||'Untitled';
 function contentCSS(fs){return `body{font-family:'Courier Prime','Tiro Bangla','Courier New',monospace;font-size:${fs}pt;line-height:1.55;color:#222}
 p{margin:0 0 .8em}h1{font-size:1.6em}h2{font-size:1.3em}h3{font-size:1.1em}h1,h2,h3{margin:1.1em 0 .45em;page-break-after:avoid}
 blockquote{margin:0 0 .8em;padding-left:1em;border-left:2px solid #999;font-style:italic}pre{background:#f2f2f2;padding:.6em .8em;white-space:pre-wrap;font-family:inherit}
@@ -255,7 +256,42 @@ function pre(p){p=p.toLowerCase();let lo=0,hi=sorted.length;while(lo<hi){const m
 const RULES=[[/\b(\w+)\s+\1\b/i,m=>'repeated word “'+m[1]+'”'],[/(^|[.!?]\s+)[a-z]/,()=>'sentence should start with a capital letter'],[/(^|\s)i(\s|'|$)/,()=>'“i” should be “I”'],
 [/\ba\s+(?!u|one|eu|once)[aeio]\w*/i,m=>'use “an” before “'+m[0].split(/\s+/)[1]+'”'],[/\ban\s+(?![aeiou]|h(our|onest|onor|eir))[a-z]\w*/i,m=>'use “a” before “'+m[0].split(/\s+/)[1]+'”'],
 [/\s[,.!?;:]/,()=>'remove the space before punctuation'],[/[,;!?][A-Za-z]/,()=>'add a space after punctuation']];
-onmessage=e=>{if(!t)return;const{id,text}=e.data;const m=text.match(/[A-Za-z']+$/),part=m?m[0]:'',done=text.slice(0,text.length-part.length);
+const APOS={dont:"don't",doesnt:"doesn't",didnt:"didn't",cant:"can't",couldnt:"couldn't",shouldnt:"shouldn't",wouldnt:"wouldn't",wont:"won't",isnt:"isn't",arent:"aren't",wasnt:"wasn't",werent:"weren't",hasnt:"hasn't",havent:"haven't",hadnt:"hadn't",im:"I'm",ive:"I've",youre:"you're",theyre:"they're",thats:"that's",whats:"what's",theres:"there's",heres:"here's",shes:"she's",youve:"you've",weve:"we've",theyve:"they've",youll:"you'll",itll:"it'll",alot:"a lot",thier:"their",recieve:"receive",untill:"until",wich:"which",becuase:"because",definately:"definitely",seperate:"separate",occured:"occurred",tommorow:"tomorrow",tomorow:"tomorrow",goverment:"government",beleive:"believe",freind:"friend",wierd:"weird",truely:"truly",begining:"beginning",teh:"the",adn:"and",taht:"that",waht:"what",becasue:"because",realy:"really",finaly:"finally",acheive:"achieve",accross:"across",adress:"address",arguement:"argument",basicly:"basically",calender:"calendar",collegue:"colleague",concious:"conscious",enviroment:"environment",existance:"existence",foriegn:"foreign",happend:"happened",immediatly:"immediately",independant:"independent",knowlege:"knowledge",libary:"library",neccessary:"necessary",noticable:"noticeable",occassion:"occasion",persue:"pursue",posession:"possession",prefered:"preferred",publically:"publicly",reccomend:"recommend",relevent:"relevant",remeber:"remember",succesful:"successful",suprise:"surprise",wether:"whether",writting:"writing"};
+const VERBS='go|do|want|need|like|say|make|know|think|come|take|see|get|look|feel|try|work|play|live|love|hate|run|walk|eat|write|read|give|tell|find|keep|leave|call|ask|seem|help|start|move|stay|watch|speak|bring|sing|sleep|drive|study|teach|buy|pay|send|open|close|wait|use|believe|understand|remember|forget|enjoy|travel';
+const AUX="(?<!\\b(?:does|did|do|will|would|can|could|should|shall|might|may|must|let|make|makes|made|help|helps|to|doesn't|didn't|don't|won't|can't|couldn't|shouldn't|wouldn't|not|why|where|when|how|what)\\s)";
+const cap=(src,w)=>/^[A-Z]/.test(src)?w[0].toUpperCase()+w.slice(1):w;
+const article=(art,word)=>{const w=word.toLowerCase();let an=/^[aeiou]/.test(w);if(/^(uni|use|usu|uti|ure|eu|one|once|ubiq)/.test(w))an=false;if(/^(hour|honest|honou?r|heir)/.test(w))an=true;const r=an?'an':'a';return /^A/.test(art)?r[0].toUpperCase()+r.slice(1):r};
+const PHRASE=[
+ [/\b(could|should|would|must|might)\s+of\b/gi,(m,a)=>a+' have','"of" should be "have"'],
+ [/\b(more|less|better|worse|rather|other|bigger|smaller|faster|slower|older|younger|higher|lower|larger|greater|longer|shorter|easier|harder|cheaper|stronger|later|earlier|sooner|happier|nicer)\s+then\b/gi,(m,a)=>a+' than','"then" should be "than"'],
+ [/\byour\s+(welcome|going|doing|not|right|wrong|being|coming|getting|making|looking|gonna)\b/gi,(m,a)=>cap(m,"you're")+' '+a,'"your" should be "you\'re"'],
+ [/\bits\s+(a|an|been|not|the|going|time|ok|okay|true|raining|late|over|my|your|just|so|very|really|getting|hard|easy|fine|good|great|important)\b/gi,(m,a)=>cap(m,"it's")+' '+a,'"its" should be "it\'s"'],
+ [/\bit's\s+own\b/gi,m=>cap(m,'its')+' own','"it\'s own" should be "its own"'],
+ [/\bthere\s+(going|not|coming|doing|getting|making|being|trying)\b/gi,(m,a)=>cap(m,"they're")+' '+a,'"there" should be "they\'re"'],
+ [/\bmore\s+(better|worse|easier|faster|bigger|smaller|happier)\b/gi,(m,a)=>a,'double comparative'],
+ [new RegExp(AUX+"\\b(he|she|it)\\s+(don't|dont)\\b",'gi'),(m,a)=>a+" doesn't",'subject-verb agreement'],
+ [new RegExp(AUX+'\\b(he|she|it)\\s+have\\b','gi'),(m,a)=>a+' has','subject-verb agreement'],
+ [new RegExp(AUX+'\\b(he|she|it)\\s+are\\b','gi'),(m,a)=>a+' is','subject-verb agreement'],
+ [/\bI\s+(is|are)\b/g,()=>'I am','subject-verb agreement'],
+ [/\b(they|we|you)\s+was\b/gi,(m,a)=>a+' were','subject-verb agreement'],
+ [/\b(they|we)\s+is\b/gi,(m,a)=>a+' are','subject-verb agreement'],
+ [/\b(they|we|you|I)\s+has\b/g,(m,a)=>a+' have','subject-verb agreement'],
+ [/\b(they|we|you|I)\s+doesn't\b/g,(m,a)=>a+" don't",'subject-verb agreement'],
+ [new RegExp('(^|[.!?;]\\s*|\\b(?:and|but|so|because|when|if|that)\\s+)(he|she|it)\\s+('+VERBS+')\\b','gi'),(m,p,a,v)=>p+a+' '+(/(s|sh|ch|x|o)$/i.test(v)?v+'es':/[^aeiou]y$/i.test(v)?v.slice(0,-1)+'ies':v+'s'),'subject-verb agreement'],
+ [/\b(did|does|do|didn't|doesn't|don't|can|could|will|would|should|must|might|may)\s+(not\s+)?(went|came|saw|ate|took|gave|wrote|spoke|knew)\b/gi,(m,a,n,v)=>a+' '+(n||'')+({went:'go',came:'come',saw:'see',ate:'eat',took:'take',gave:'give',wrote:'write',spoke:'speak',knew:'know'})[v.toLowerCase()],'verb form after a helper verb'],
+ [/\b(a|an)\s+([A-Za-z][\w-]*)/g,(m,a,w)=>article(a,w)+' '+w,'"a" or "an"'],
+ [/\b(\w+)\s+\1\b/gi,(m,a)=>/^(had|that|is|very|so|bye|ha|no|yes)$/i.test(a)?m:a,'repeated word'],
+ [/(^|\s)i(?=\s|'|$|[,.!?;:])/g,(m,p)=>p+'I','"i" should be "I"'],
+ [/[ \t]+([,.!?;:])/g,(m,a)=>a,'space before punctuation'],
+ [/([,;!?])([A-Za-z])/g,(m,a,b)=>a+' '+b,'space after punctuation'],
+ [/ {2,}/g,()=>' ','extra spaces'],
+ [/(^\s*|[.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase(),'capital letter at sentence start']];
+function fix(text){const why=[];let out=text;
+ out=out.replace(/[A-Za-z']+/g,w=>{const k=w.toLowerCase();const r=APOS[k];if(!r)return w;why.push('spelling: '+w+' → '+r);return /^I'/.test(r)?r:cap(w,r)});
+ if(t){let n=0;const src=out;out=out.replace(/[A-Za-z][A-Za-z']*/g,(w,i)=>{if(n>=6||w.length<3||w.length>14||/^[A-Z]{2,}$/.test(w)||ok(w))return w;const before=src.slice(0,i).trimEnd();if(/^[A-Z]/.test(w)&&before&&!/[.!?]$/.test(before))return w;n++;const s=t.suggest(w,3);if(!s||!s.length)return w;const r=s[0];why.push('spelling: '+w+' → '+r);return cap(w,r)})}
+ for(const[re,f,label]of PHRASE){const nxt=out.replace(re,f);if(nxt!==out){if(!why.includes(label))why.push(label);out=nxt}}
+ return{text:out,why:why.slice(0,4)}}
+onmessage=e=>{if(e.data&&e.data.fix){let r;try{r=fix(e.data.text)}catch(err){r={text:e.data.text,why:[]}}return postMessage({fixId:e.data.fixId,text:r.text,why:r.why})}if(!t)return;const{id,text}=e.data;const m=text.match(/[A-Za-z']+$/),part=m?m[0]:'',done=text.slice(0,text.length-part.length);
 let bad=null;const re=/[A-Za-z][A-Za-z']*/g;let x;
 while((x=re.exec(done))){let w=x[0].replace(/'s$|'$/,'');if(w.length<2&&!/^[aAI]$/.test(w)){if(!/^[aI]$/i.test(w))bad='spelling: “'+w+'”';continue}
  if(ok(w))continue;const before=done.slice(0,x.index).trimEnd();const start=!before||/[.!?]$/.test(before);if(/^[A-Z]/.test(w)&&!start)continue;if(/^[A-Z]{2,}$/.test(w))continue;bad='spelling: “'+w+'”'}
@@ -286,7 +322,7 @@ window.addEventListener('appinstalled',()=>{$('#bInstall').hidden=true;toast('Po
   const h=location.hash;if(h.startsWith('#s='))return reader(h.slice(3));
   await DB.open();docs=await DB.all();window.twBooted=true;setTimeout(drawCursor,0);
   // purge trash older than 30 days
-  const old=docs.filter(d=>d.trashed&&Date.now()-d.updated>2592e6);old.forEach(d=>DB.del(d.id));docs=docs.filter(d=>!old.includes(d));
+  const old=docs.filter(d=>d.trashed&&Date.now()-(d.trashedAt||Date.now())>2592e6);old.forEach(d=>DB.del(d.id));docs=docs.filter(d=>!old.includes(d));
   const last=docs.find(d=>d.id===ls.get('last')&&!d.trashed&&!d.archived);
   if(last)openDoc(last);else{blank();ed.focus();caretEnd();count();requestAnimationFrame(drawCursor)}
 

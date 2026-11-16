@@ -8,6 +8,7 @@
   let gOn = false;
   fetch(URL_ + '/auth/v1/settings', { headers: { apikey: KEY } }).then(r => r.json()).then(j => { gOn = !!(j.external && j.external.google); }).catch(() => {});
   const queue = new Map();
+  const saveQ = () => ls.set(lsKey('queue'), [...queue.values()].map(i => ({ id: i.id, updated: i.updated, deleted: !!i.deleted })));
   const lsKey = k => 'sync.' + k + '.' + (user ? user.id : '');
 
   /* ---------- UI ---------- */
@@ -63,10 +64,11 @@ ${gOn ? `<button class="gbtn" id="gIn">${G} Continue with Google</button>
   const row = d => ({ id: d.id, data: d, updated: ver(d) || Date.now(), deleted: false });
   async function push() {
     if (!user || !queue.size || !navigator.onLine) return;
-    const items = [...queue.values()]; queue.clear();
+    const items = [...queue.values()].map(i => i.deleted ? { id: i.id, data: {}, updated: i.updated, deleted: true } : (docs.find(x => x.id === i.id) ? row(docs.find(x => x.id === i.id)) : null)).filter(Boolean); queue.clear();
+    if (!items.length) { saveQ(); return; }
     const { error } = await sb.from('notes').upsert(items, { onConflict: 'user_id,id' });
-    if (error) { items.forEach(i => queue.set(i.id, i)); ls.set(lsKey('queue'), [...queue.values()]); throw error; }
-    ls.set(lsKey('queue'), []);
+    if (error) { items.forEach(i => queue.set(i.id, i)); saveQ(); throw error; }
+    saveQ();
   }
   async function pull() {
     const since = ls.get(lsKey('pulled2'), '1970-01-01T00:00:00Z');
@@ -82,9 +84,14 @@ ${gOn ? `<button class="gbtn" id="gIn">${G} Continue with Google</button>
           if (r.deleted) { if (local && ver(local) <= r.updated) { docs.splice(docs.indexOf(local), 1); await DB.del(r.id); if (cur === local) newDoc(); } continue; }
           if (local && ver(local) >= r.updated) continue;
           const d = { ...r.data, owner: user.id, rev: r.updated };
+          if (local && cur === local && dirty) {
+            const copy = { ...d, id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: (d.title || 'Untitled') + ' (other device)', rev: Date.now() };
+            docs.push(copy); applying = false; await DB.put(copy); applying = true;
+            toast('This note was also edited on another device. That version was saved as a copy.'); continue;
+          }
           if (local) Object.assign(local, d); else docs.push(d);
           await DB.put(local || d);
-          if (cur && cur.id === d.id && !dirty && document.activeElement !== ed) { ed.innerHTML = d.html || '<p><br></p>'; $('#title').value = d.title; count(); }
+          if (cur && cur.id === d.id && !dirty) { ed.innerHTML = d.html || '<p><br></p>'; $('#title').value = d.title; count(); if (document.activeElement === ed) caretEnd(); }
         }
       } finally { applying = false; }
       if (data.length < 500) break; from += 500;
@@ -103,8 +110,8 @@ ${gOn ? `<button class="gbtn" id="gIn">${G} Continue with Google</button>
 
   // capture local changes
   const put0 = DB.put.bind(DB), del0 = DB.del.bind(DB);
-  DB.put = d => { if (user && !applying) d.rev = Date.now(); return put0(d).then(r => { if (user && !applying) { d.owner = user.id; queue.set(d.id, row(d)); ls.set(lsKey('queue'), [...queue.values()]); soon(); } return r; }); };
-  DB.del = id => del0(id).then(r => { if (user && !applying) { queue.set(id, { id, data: {}, updated: Date.now(), deleted: true }); ls.set(lsKey('queue'), [...queue.values()]); soon(); } return r; });
+  DB.put = d => { if (user && !applying) d.rev = Date.now(); return put0(d).then(r => { if (user && !applying) { d.owner = user.id; queue.set(d.id, { id: d.id, updated: ver(d) }); saveQ(); soon(); } return r; }); };
+  DB.del = id => del0(id).then(r => { if (user && !applying) { queue.set(id, { id, updated: Date.now(), deleted: true }); saveQ(); soon(); } return r; });
 
   async function onUser(u) {
     const prev = user; user = u;

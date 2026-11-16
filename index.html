@@ -289,6 +289,8 @@ body.typing #ctx{opacity:.35}body.focus #ctx,body.reading #ctx,body.reading #fin
   <label>Sound volume <input id="s-vol" data-k="vol" type="range" min=".05" max="1" step=".05"></label>
   <label>Vibration (phones) <input id="s-haptic" data-k="haptic" type="checkbox"></label>
   <label>Spelling &amp; grammar lights <input id="s-check" data-k="check" type="checkbox"></label>
+  <label>Grammar &amp; sentence suggestions <input id="s-gsug" data-k="gsug" type="checkbox"></label>
+  <label title="Sends the sentence you just wrote to LanguageTool for deeper checks. Off = everything stays on your device.">Smarter grammar online (LanguageTool) <input id="s-lt" data-k="ltOnline" type="checkbox"></label>
   <label>Brightness <input id="s-glow" data-k="glow" type="range" min=".2" max="1" step=".01"></label>
   <h4>Type</h4>
   <label>Font <select id="s-font" data-k="font" class="field" style="width:160px">
@@ -343,6 +345,7 @@ body.typing #ctx{opacity:.35}body.focus #ctx,body.reading #ctx,body.reading #fin
 <script src="typefx.js"></script>
 <script src="insights.js"></script>
 <script src="game.js"></script>
+<script src="grammar.js"></script>
 <script src="vendor/supabase.js"></script>
 <script src="sync.js"></script>
 </body></html>

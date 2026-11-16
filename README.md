@@ -19,6 +19,7 @@ A quiet digital typewriter for daily writing. Open it and start typing: the line
 - Optional accounts: sign in with Google or an email link to sync notes across all your devices; keep writing offline and it syncs when you reconnect
 - Word-style tools: sheets with formulas (SUM, AVERAGE, MIN, MAX…), table editing, pictures, fonts, sizes, line spacing, page breaks, find & replace
 - Typing practice game: 12 stages (home row to marathon), word-rain mode, stars and unlocks, weak-key workouts built from your mistakes, speed history. Open with the practice key, Ctrl+Shift+G, or /#practice
+- Grammar and sentence suggestions: finish a sentence and a corrected version appears under the rail (Apply with Alt+Enter, Ignore with Esc). ✓ check in Aa (Ctrl+Shift+K) checks the whole document. Works offline; optional LanguageTool mode in Settings for deeper online checks
 - Writing insights: words today, streak, 14-day chart, typing speed, readability, overused words, suggestions
 - Works offline and installs as an app (desktop, tablet and phone)
 
@@ -63,6 +64,7 @@ Without an account, documents stay in your browser (IndexedDB). Signing in (Goog
 | `insights.js` | Writing insights panel |
 | `office.js` | Sheets, tables, pictures, fonts, find & replace |
 | `game.js` | Typing practice game |
+| `grammar.js` | Grammar and sentence suggestions |
 | `supabase/schema.sql` | Database table and security rules |
 | `release/Po-Notestack.apk` | Android app (phones and tablets) |
 | `manifest.webmanifest`, `icon-*.png` | App install metadata and icons |

@@ -146,7 +146,7 @@ function stats(){const ms=S.t0?Date.now()-S.t0:0,min=Math.max(ms/60000,1/600);
   const total=Object.values(S.keys).reduce((a,v)=>a+v.h+v.m,0),miss=Object.values(S.keys).reduce((a,v)=>a+v.m,0);
   return{wpm:Math.round(ok/5/min),acc:total?Math.round((1-miss/total)*1000)/10:100,ms}}
 function hud(){const s=stats();$('#hW').textContent=s.wpm;$('#hA').textContent=s.acc+'%';
-  if(S.st.type==='timed')$('#hT').textContent=Math.max(0,Math.ceil(S.st.time-s.ms/1000));else $('#hT').textContent=Math.floor(s.ms/1000)+'s'}
+  if(S.st.type==='timed'||S.st.type==='rain')$('#hT').textContent=Math.max(0,Math.ceil(S.st.time-s.ms/1000));else $('#hT').textContent=Math.floor(s.ms/1000)+'s'}
 gin.addEventListener('input',()=>{if(!S||S.done||S.st.type==='rain')return;
   let v=gin.value;if(v.length>S.text.length)v=v.slice(0,S.text.length);
   if(!S.t0&&v.length){S.t0=Date.now();tick=setInterval(()=>{hud();if(S.st.type==='timed'&&stats().ms>=S.st.time*1000)finish()},250)}
@@ -166,7 +166,7 @@ let drops=[],lastSpawn=0,rainIn=null;
 function rainStart(){drops=[];lastSpawn=0;loop.last=0;const box=$('#gRain');rainIn=$('#gRainIn');S.t0=0;
   rainIn.oninput=()=>{const v=rainIn.value.trim().toLowerCase();if(!S.t0){S.t0=Date.now();tick=setInterval(()=>{hud();$('#hT').textContent=Math.max(0,Math.ceil(S.st.time-(Date.now()-S.t0)/1000));if(Date.now()-S.t0>=S.st.time*1000)finish()},250);raf=requestAnimationFrame(loop)}
     snd(rainIn.value.endsWith(' ')?'space':'key');drops.forEach(d=>d.el.classList.toggle('hit',!!v&&d.w.startsWith(v)));
-    if(/\s$/.test(rainIn.value))fire(v);else{const d=drops.find(d=>d.w===v);if(d)fire(v)}};
+    if(/\s$/.test(rainIn.value))fire(v);else{const d=drops.find(d=>d.w===v);if(d&&!drops.some(o=>o.w.length>v.length&&o.w.startsWith(v)))fire(v)}};
   rainIn.onpaste=e=>e.preventDefault();rainIn.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();fire(rainIn.value.trim().toLowerCase())}if(e.key==='Escape'){e.preventDefault();start(S.st)}};
   box.innerHTML='<div style="position:absolute;inset:0;display:grid;place-items:center;opacity:.6;font-size:14px">start typing to begin the rain</div>';
   setTimeout(()=>rainIn.focus(),30)}
@@ -191,7 +191,7 @@ function finish(){if(!S||S.done)return;const s=stats(),st=S.st;stop();
   for(const[k,v]of Object.entries(S.keys)){const g=G.keys[k]=G.keys[k]||{h:0,m:0};g.h=Math.round((g.h+v.h)*10)/10;g.m=Math.round((g.m+v.m)*10)/10}
   let stars=0;
   if(st.type==='rain'){stars=S.score>=st.goal*1.5?3:S.score>=st.goal?2:S.score>=st.goal*.5?1:0}
-  else if(s.acc>=st.acc-5){stars=1;if(s.wpm>=st.wpm&&s.acc>=st.acc)stars=2;if(s.wpm>=Math.round(st.wpm*1.3)&&s.acc>=Math.max(st.acc,97))stars=3}
+  else if(s.acc>=st.acc-5&&s.wpm>=Math.round(st.wpm*.5)){stars=1;if(s.wpm>=st.wpm&&s.acc>=st.acc)stars=2;if(s.wpm>=Math.round(st.wpm*1.3)&&s.acc>=Math.max(st.acc,97))stars=3}
   const prev=G.best[st.id],better=!prev||(st.type==='rain'?S.score>(prev.score||0):s.wpm>(prev.wpm||0));
   if(!st.practice){G.stars[st.id]=Math.max(G.stars[st.id]||0,stars);if(better)G.best[st.id]={wpm:s.wpm,acc:s.acc,score:S.score}}
   G.hist.push({d:Date.now(),s:st.id,wpm:s.wpm,acc:s.acc});if(G.hist.length>200)G.hist=G.hist.slice(-200);save();

@@ -125,6 +125,24 @@
     if (t === 'deleteContentBackward' && buf) { e.preventDefault(); if (!update(buf.slice(0, -1))) { reset(); document.execCommand('delete'); } return; }
     if (t !== 'insertText') reset();
   });
+  // Android/IME keyboards compose words instead of sending single letters: convert each word when composition ends
+  ed.addEventListener('compositionend', e => {
+    if (!S.bangla) return;
+    const w = (e.data || '').trim();
+    if (!w || !/^[A-Za-z^:`+0-9.$]+$/.test(w)) return;
+    setTimeout(() => {
+      const s = getSelection(); if (!s.rangeCount) return; const n = s.anchorNode, off = s.anchorOffset;
+      if (!n || n.nodeType !== 3) return; const before = n.data.slice(0, off), i = before.lastIndexOf(w);
+      if (i < 0 || before.length - i - w.length > 1) return;
+      const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + w.length); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('delete'); reset();
+      for (const ch of w) {
+        if (/[A-Za-z^:`+]/.test(ch)) { if (!update(buf + ch)) { reset(); update(ch); } continue; }
+        reset(); document.execCommand('insertText', false, /[0-9]/.test(ch) ? DIG[+ch] : ch === '.' ? '।' : ch === '$' ? '৳' : ch);
+      }
+      if (off > i + w.length) { const s2 = getSelection(); s2.modify && s2.modify('move', 'forward', 'character'); }
+    }, 0);
+  });
   ed.addEventListener('keydown', e => {
     if (!S.bangla || !buf) return;
     const open = !box.hidden;
@@ -139,7 +157,7 @@
   stage.addEventListener('scroll', () => { if (!box.hidden) show(); }, { passive: true });
 
   const btn = $('#bLang');
-  function paint() { btn.textContent = S.bangla ? 'বাং' : 'EN'; btn.classList.toggle('bn', !!S.bangla); btn.classList.toggle('on', !!S.bangla); document.body.classList.toggle('bangla', !!S.bangla); if (S.bangla) loadDict(); }
+  function paint() { btn.textContent = S.bangla ? 'বাং' : 'EN'; btn.classList.toggle('bn', !!S.bangla); btn.classList.toggle('on', !!S.bangla); document.body.classList.toggle('bangla', !!S.bangla); ed.setAttribute('autocapitalize', S.bangla ? 'off' : 'sentences'); ed.setAttribute('autocorrect', S.bangla ? 'off' : 'on'); if (S.bangla) loadDict(); }
   function toggle() { S.bangla = !S.bangla; reset(); applyS(); paint(); toast(S.bangla ? 'বাংলা typing on: type “ami tOmake bhalobashi”' : 'English typing'); ed.focus(); }
   btn.addEventListener('mousedown', e => e.preventDefault());
   btn.onclick = toggle;
