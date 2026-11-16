@@ -5,6 +5,8 @@
   if (!window.supabase || location.hash.startsWith('#s=')) return;
   const sb = window.supabase.createClient(URL_, KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' } });
   let user = null, timer = null, busy = false, applying = false;
+  let gOn = false;
+  fetch(URL_ + '/auth/v1/settings', { headers: { apikey: KEY } }).then(r => r.json()).then(j => { gOn = !!(j.external && j.external.google); }).catch(() => {});
   const queue = new Map();
   const lsKey = k => 'sync.' + k + '.' + (user ? user.id : '');
 
@@ -26,11 +28,11 @@
     if (!user) {
       dlg.innerHTML = `<div class="dh"><b>Sign in to Po Notestack</b><button class="mini" data-close>close</button></div>
 <p class="note">Sign in to keep your notes safe in your account and open them on any device. You can keep writing offline; changes sync when you're back online.</p>
-<button class="gbtn" id="gIn">${G} Continue with Google</button>
-<div class="or">or get a sign-in link by email</div>
+${gOn ? `<button class="gbtn" id="gIn">${G} Continue with Google</button>
+<div class="or">or get a sign-in link by email</div>` : '<p class="note">Enter your email and we will send you a one-tap sign-in link.</p>'}
 <form id="mailF" class="row"><input id="mailIn" class="field" type="email" required placeholder="you@example.com" style="flex:1" autocomplete="email"><button class="btn">Send link</button></form>
 <p class="note" id="acctMsg"></p>`;
-      $('#gIn').onclick = () => sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + '/' } }).then(r => { if (r.error) $('#acctMsg').textContent = r.error.message; });
+      if ($('#gIn')) $('#gIn').onclick = () => sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + '/' } }).then(r => { if (r.error) $('#acctMsg').textContent = r.error.message; });
       $('#mailF').onsubmit = async e => {
         e.preventDefault(); $('#acctMsg').textContent = 'Sending…';
         const { error } = await sb.auth.signInWithOtp({ email: $('#mailIn').value.trim(), options: { emailRedirectTo: location.origin + '/' } });
