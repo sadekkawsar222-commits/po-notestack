@@ -21,12 +21,12 @@ button,input,select{font:inherit;color:inherit}
 :root{--glow:1}
 #scene{position:fixed;inset:0;pointer-events:none;z-index:0}
 #glowW{position:absolute;left:0;top:0;width:0;height:0;transition:transform .14s ease-out;will-change:transform}
-#glow{position:absolute;left:-700px;top:-600px;width:1400px;height:1200px;mix-blend-mode:screen;transition:opacity .9s ease;filter:blur(10px);
-  background:conic-gradient(from -64deg at 50% 50%,transparent 0deg,rgba(255,236,196,.35) 8deg,rgba(255,244,218,.85) 30deg,rgba(255,246,224,.95) 48deg,rgba(255,238,204,.6) 70deg,rgba(255,230,190,.15) 84deg,transparent 92deg,transparent 360deg);
-  -webkit-mask-image:radial-gradient(circle 560px at 50% 50%,#000 0,rgba(0,0,0,.9) 18%,rgba(0,0,0,.5) 48%,rgba(0,0,0,.15) 75%,transparent 92%);mask-image:radial-gradient(circle 560px at 50% 50%,#000 0,rgba(0,0,0,.9) 18%,rgba(0,0,0,.5) 48%,rgba(0,0,0,.15) 75%,transparent 92%)}
-#glow::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70px 30px at 50% 50%,rgba(255,252,240,1),transparent),radial-gradient(ellipse 150px 90px at 49% 46%,rgba(255,244,214,.75),transparent 75%),radial-gradient(ellipse 120px 40px at 50% 52%,rgba(255,240,205,.45),transparent 80%)}
+#glow{position:absolute;left:-700px;top:-600px;width:1400px;height:1200px;mix-blend-mode:screen;transition:opacity .9s ease;filter:blur(5px);
+  background:conic-gradient(from -58deg at 50% 50%,transparent 0deg,rgba(255,232,190,.25) 6deg,rgba(255,240,212,.8) 16deg,rgba(255,248,230,1) 30deg,rgba(255,244,220,.9) 40deg,rgba(255,236,200,.35) 46deg,transparent 49deg,transparent 360deg);
+  -webkit-mask-image:radial-gradient(circle 600px at 50% 50%,#000 0,#000 14%,rgba(0,0,0,.8) 34%,rgba(0,0,0,.4) 60%,transparent 90%);mask-image:radial-gradient(circle 600px at 50% 50%,#000 0,#000 14%,rgba(0,0,0,.8) 34%,rgba(0,0,0,.4) 60%,transparent 90%)}
+#glow::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 46px 18px at 50% 50%,rgba(255,253,244,1),transparent),radial-gradient(ellipse 90px 46px at 48% 46%,rgba(255,246,222,.55),transparent 80%)}
 #vig{position:absolute;inset:0;mix-blend-mode:multiply;transition:opacity .9s;
-  background:radial-gradient(circle 620px at var(--lx,50%) calc(var(--ly,72%) - 180px),transparent 0,transparent 22%,rgba(58,66,80,.28) 60%,rgba(40,46,58,.5) 100%),linear-gradient(180deg,rgba(70,80,96,.22),rgba(70,80,96,.08) 60%,rgba(40,46,58,.2))}
+  background:radial-gradient(circle 380px at var(--lx,50%) calc(var(--ly,72%) - 150px),rgba(255,255,255,0) 0,rgba(255,255,255,0) 40%,rgba(70,80,96,.18) 100%),linear-gradient(180deg,rgba(74,84,100,.36),rgba(74,84,100,.24) 55%,rgba(52,58,70,.34))}
 #grain{position:absolute;inset:0;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
 body.off #glow{opacity:0!important}
 body.off #vig{opacity:1.6}
