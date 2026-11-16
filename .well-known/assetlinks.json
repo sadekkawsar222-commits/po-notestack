@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.po_notestack.twa",
+        "sha256_cert_fingerprints": ["71:15:90:9A:E0:5C:23:42:88:59:E7:F1:99:58:17:39:51:76:D2:39:3A:7B:72:E5:F6:C8:2F:71:AF:6B:84:C3"]
+      }
+    }]

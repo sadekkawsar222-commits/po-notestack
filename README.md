@@ -32,8 +32,8 @@ Then open http://localhost:3000. Or deploy the folder to any static host (Vercel
 
 ## Install as an app
 
-- **Desktop (Chrome / Edge):** open the live app and press the **install** key in the top bar, or the install icon in the address bar.
-- **Android:** open the live app in Chrome → menu → *Install app*. An APK can be generated from the live URL with [PWABuilder](https://www.pwabuilder.com).
+- **Windows / Mac / Linux (Chrome or Edge):** open the live app and press the **install** key in the top bar, or the install icon in the address bar.
+- **Android (APK):** download [Po-Notestack.apk](https://po-notestack.vercel.app/release/Po-Notestack.apk) (also in `release/`), open it and allow *Install unknown apps* when asked. Needs Android 7.0 or newer. Or open the live app in Chrome → menu → *Install app*.
 - **iPhone / iPad:** open in Safari → Share → *Add to Home Screen*.
 
 ## Data and privacy
