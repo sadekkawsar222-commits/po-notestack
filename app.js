@@ -63,9 +63,10 @@ function caretRect(){const s=getSelection();if(!s.rangeCount||!ed.contains(s.anc
 function tws(){if(!S.tws)return;const b=caretRect();if(!b)return;stage.scrollTop+=b.top+b.height/2-stage.clientHeight*S.vpos}
 function moveLamp(b){const x=Math.max(30,Math.min(innerWidth-30,b.left)),r=document.documentElement.style;
   const y=Math.round(S.tws&&!document.body.classList.contains('reading')?stage.getBoundingClientRect().top+stage.clientHeight*S.vpos+b.height/2+Math.max(16,S.size):b.top+b.height+3);
-  r.setProperty('--lx',x+'px');r.setProperty('--ly',y+'px');$('#glowW').style.transform=`translate(${x}px,${y}px)`}
+  moveLamp.done=b.top!==undefined&&!b.idle;r.setProperty('--lx',x+'px');r.setProperty('--ly',y+'px')}
+function placeIdle(){const c=ed.getBoundingClientRect(),cs=getComputedStyle(ed),h=S.size*1.15,p=ed.querySelector('p,h1,h2,h3,li,div');const l=p?p.getBoundingClientRect().left:c.left+parseFloat(cs.paddingLeft);moveLamp({left:l,top:stage.clientHeight*S.vpos-h/2,height:h,idle:1})}
 function drawCursor(){const s=getSelection();
-  const b=s.rangeCount&&s.isCollapsed?caretRect():null;if(b)moveLamp(b);
+  const b=s.rangeCount&&s.isCollapsed?caretRect():null;if(b)moveLamp(b);else if(!moveLamp.done)placeIdle();
   if(S.cursor==='native'||document.activeElement!==ed||!b){curEl.hidden=true;return}
   const fs=parseFloat(getComputedStyle(s.anchorNode.nodeType===3?s.anchorNode.parentNode:s.anchorNode).fontSize)||S.size;
   const h=fs*1.15,mid=b.top+b.height/2;curEl.hidden=false;curEl.style.left=b.left+'px';
@@ -280,7 +281,7 @@ window.addEventListener('appinstalled',()=>{$('#bInstall').hidden=true;toast('Po
 /* ---------- boot ---------- */
 (async()=>{applyS();
   const h=location.hash;if(h.startsWith('#s='))return reader(h.slice(3));
-  await DB.open();docs=await DB.all();window.twBooted=true;
+  await DB.open();docs=await DB.all();window.twBooted=true;setTimeout(drawCursor,0);
   // purge trash older than 30 days
   const old=docs.filter(d=>d.trashed&&Date.now()-d.updated>2592e6);old.forEach(d=>DB.del(d.id));docs=docs.filter(d=>!old.includes(d));
   const last=docs.find(d=>d.id===ls.get('last')&&!d.trashed&&!d.archived);
