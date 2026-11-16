@@ -14,29 +14,31 @@ ul{padding-left:1.2em}
 </style></head>
 <body><main>
 <h1>Po Notestack</h1>
-<p class="meta">Privacy notice, terms of use and open-source credits · Last updated 16 November 2026</p>
+<p class="meta">Privacy notice, terms of use and open-source credits · Last updated 16 November 2026 (accounts and sync added)</p>
 
 <h2>Privacy</h2>
 <ul>
-<li><b>Your writing stays on your device.</b> Documents, folders and settings are stored in your browser (IndexedDB and local storage). Po Notestack has no server database, no accounts, no analytics and no advertising trackers.</li>
+<li><b>Without an account, your writing stays on your device.</b> Documents, folders and settings are stored in your browser (IndexedDB and local storage). Nothing is uploaded.</li>
+<li><b>With an account (optional).</b> If you sign in with Google or an email link, your documents are also stored in your private account so you can open them on other devices. They are kept in a Supabase database (Mumbai, India region) and protected by row-level security, so each account can read and change only its own notes. We store your email address, your name and profile picture from Google (if you use Google), and your documents. Signing out removes that account's notes from the device you sign out on; they stay in your account. To delete your account and all its notes, email the operator from the address you signed in with.</li>
+<li><b>No advertising or tracking.</b> Po Notestack has no analytics, ads or tracking cookies. The operator can see the list of registered accounts and the number of stored notes in the database console.</li>
 <li><b>Shared links.</b> When you create a share link, the document is compressed and encrypted (AES-256-GCM) in your browser. The key and the encrypted text live only inside the link after the “#”, which browsers never send to any server. Anyone who has the full link (and the password, if you set one) can read that copy. A link cannot be withdrawn once sent; use an expiry date or a password for sensitive text. Expiry is checked by the reader's browser.</li>
-<li><b>Third-party requests.</b> To display fonts, the page loads typefaces from Google Fonts (fonts.googleapis.com / fonts.gstatic.com), and the spelling dictionaries are loaded from jsDelivr (cdn.jsdelivr.net). These services receive your IP address and browser details as part of a normal web request; they never receive your documents. The site is hosted on Vercel, which keeps standard server access logs.</li>
+<li><b>Third-party requests.</b> To display fonts, the page loads typefaces from Google Fonts (fonts.googleapis.com / fonts.gstatic.com), and the spelling dictionaries are loaded from jsDelivr (cdn.jsdelivr.net). These services receive your IP address and browser details as part of a normal web request; they never receive your documents. Google receives your sign-in request only when you choose “Continue with Google”. The site is hosted on Vercel, which keeps standard server access logs.</li>
 <li><b>Spell checking and Bangla suggestions</b> run entirely in your browser. Your text is not sent anywhere.</li>
-<li><b>Clearing data.</b> Clearing your browser's site data for this address permanently deletes your documents. Export important work regularly (PDF, DOCX, Markdown or TXT).</li>
+<li><b>Clearing data.</b> Without an account, clearing your browser's site data permanently deletes your documents. Sign in or export important work regularly (PDF, DOCX, Markdown or TXT).</li>
 </ul>
 
 <h2>Terms of use</h2>
 <ul>
 <li>Po Notestack is provided free of charge, “as is”, without warranty of any kind. To the extent permitted by law, the operator is not liable for lost or damaged writing, including loss caused by browser storage being cleared.</li>
 <li>You own everything you write. You are responsible for the content you share through share links and must not use the service to distribute unlawful content.</li>
-<li>Do not attempt to disrupt, overload or reverse-engineer the hosting infrastructure.</li>
+<li>Do not attempt to disrupt or overload the hosted service or access other people's accounts. The source code itself is open source under the MIT License, so you are free to study, modify and self-host it.</li>
 <li>These terms may be updated; the date above shows the latest version.</li>
 </ul>
 
 <h2>Open-source credits</h2>
 <ul>
 <li>Courier Prime (Alan Dague-Greene), Tiro Bangla (Tiro Typeworks), Special Elite, IBM Plex Mono — SIL Open Font License 1.1, via Google Fonts.</li>
-<li>DOMPurify — Apache 2.0 / MPL 2.0. JSZip — MIT. Turndown and turndown-plugin-gfm — MIT. Typo.js — Modified BSD.</li>
+<li>DOMPurify — Apache 2.0 / MPL 2.0. JSZip — MIT. Turndown and turndown-plugin-gfm — MIT. Typo.js — Modified BSD. supabase-js — MIT.</li>
 <li>English dictionary: <i>dictionary-en</i> (Wooorm), based on SCOWL / Hunspell en_US — MIT and BSD-style licenses.</li>
 <li>Bangla word list: LibreOffice <i>bn_BD</i> Hunspell dictionary — GPL 2.0, used unmodified as reference data.</li>
 </ul>

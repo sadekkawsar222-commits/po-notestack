@@ -276,7 +276,7 @@ window.addEventListener('appinstalled',()=>{$('#bInstall').hidden=true;toast('Po
 /* ---------- boot ---------- */
 (async()=>{applyS();
   const h=location.hash;if(h.startsWith('#s='))return reader(h.slice(3));
-  await DB.open();docs=await DB.all();
+  await DB.open();docs=await DB.all();window.twBooted=true;
   // purge trash older than 30 days
   const old=docs.filter(d=>d.trashed&&Date.now()-d.updated>2592e6);old.forEach(d=>DB.del(d.id));docs=docs.filter(d=>!old.includes(d));
   const last=docs.find(d=>d.id===ls.get('last')&&!d.trashed&&!d.archived);

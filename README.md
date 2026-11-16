@@ -16,7 +16,9 @@ A quiet digital typewriter for daily writing. Open it and start typing: the line
 - Share: encrypted read-only links (AES-256-GCM, key stays in the link), optional password and expiry
 - Themes: Original (lamp-lit paper), Night (solid black and white), Classic Paper; adjustable font, size, spacing, width, cursor
 - Focus while typing: menus hide and earlier paragraphs fade; Focus mode keeps them hidden
-- Works offline and installs as an app (desktop and phone)
+- Optional accounts: sign in with Google or an email link to sync notes across all your devices; keep writing offline and it syncs when you reconnect
+- Writing insights: words today, streak, 14-day chart, typing speed, readability, overused words, suggestions
+- Works offline and installs as an app (desktop, tablet and phone)
 
 ## Run it yourself
 
@@ -38,18 +40,29 @@ Then open http://localhost:3000. Or deploy the folder to any static host (Vercel
 
 ## Data and privacy
 
-Documents are stored in your browser only (IndexedDB). There are no accounts and no tracking. See `legal.html` for the full privacy notice, terms and open-source credits.
+Without an account, documents stay in your browser (IndexedDB). Signing in (Google or email link) is optional and syncs your notes across devices through Supabase, protected by row-level security so each account sees only its own notes. No ads or tracking. See `legal.html` for the full privacy notice, terms and open-source credits.
+
+## Self-hosting with your own sync backend
+
+1. Create a Supabase project and run `supabase/schema.sql` in its SQL editor.
+2. In Authentication → URL Configuration set the Site URL to your app address; enable the Google provider if you want Google sign-in.
+3. Put your project URL and publishable key at the top of `sync.js`, and add the project URL to `connect-src` in `vercel.json`.
 
 ## Files
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | The whole app (UI, editor, storage, export, sharing, checker) |
+| `index.html` | Page layout and styles |
 | `bangla.js` | Banglish → Bangla phonetic engine and suggestions |
 | `typefx.js` | Typewriter sounds, vibration and strike effect |
 | `sw.js` | Offline support |
+| `app.js` | Editor, storage, export, sharing, spelling lights |
+| `sync.js` | Accounts and cloud sync |
+| `insights.js` | Writing insights panel |
+| `supabase/schema.sql` | Database table and security rules |
+| `release/Po-Notestack.apk` | Android app (phones and tablets) |
 | `manifest.webmanifest`, `icon-*.png` | App install metadata and icons |
-| `vendor/` | Self-hosted libraries (DOMPurify, JSZip, Turndown, Typo.js) |
+| `vendor/` | Self-hosted libraries (DOMPurify, JSZip, Turndown, Typo.js, supabase-js) |
 | `legal.html` | Privacy, terms and credits |
 | `vercel.json` | Security headers |
 
