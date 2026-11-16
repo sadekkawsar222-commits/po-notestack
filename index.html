@@ -21,13 +21,13 @@ button,input,select{font:inherit;color:inherit}
 :root{--glow:1}
 #scene{position:fixed;inset:0;pointer-events:none;z-index:0}
 #glowW{position:absolute;left:0;top:0;width:0;height:0;transition:transform .14s ease-out;will-change:transform}
-#glow{position:absolute;left:-800px;top:-800px;width:1600px;height:1600px;mix-blend-mode:screen;transition:opacity .9s ease;filter:blur(5px);
+#glow{position:absolute;left:-1000px;top:-1000px;width:2000px;height:2000px;mix-blend-mode:screen;transition:opacity .9s ease;filter:blur(5px);
   background:conic-gradient(from -64deg at 50% 50%,transparent 0deg,rgba(255,236,196,.62) 10deg,rgba(255,240,206,.92) 24deg,#fff4dc 50deg,rgba(255,242,212,.95) 72deg,rgba(255,238,200,.8) 92deg,rgba(255,236,196,.3) 104deg,transparent 112deg,transparent 360deg);
-  -webkit-mask-image:radial-gradient(circle min(58vh,540px) at 50% 50%,#000 0,#000 7%,rgba(0,0,0,.82) 22%,rgba(0,0,0,.52) 42%,rgba(0,0,0,.24) 64%,rgba(0,0,0,.07) 85%,transparent 100%);mask-image:radial-gradient(circle min(58vh,540px) at 50% 50%,#000 0,#000 7%,rgba(0,0,0,.82) 22%,rgba(0,0,0,.52) 42%,rgba(0,0,0,.24) 64%,rgba(0,0,0,.07) 85%,transparent 100%)}
+  -webkit-mask-image:radial-gradient(circle min(92vh,860px) at 50% 50%,#000 0,#000 6%,rgba(0,0,0,.86) 18%,rgba(0,0,0,.64) 34%,rgba(0,0,0,.42) 52%,rgba(0,0,0,.22) 70%,rgba(0,0,0,.08) 86%,transparent 100%);mask-image:radial-gradient(circle min(92vh,860px) at 50% 50%,#000 0,#000 6%,rgba(0,0,0,.86) 18%,rgba(0,0,0,.64) 34%,rgba(0,0,0,.42) 52%,rgba(0,0,0,.22) 70%,rgba(0,0,0,.08) 86%,transparent 100%)}
 #glow::after{content:'';position:absolute;inset:0;background:radial-gradient(circle 230px at 50% 50%,rgba(255,236,186,1) 0,rgba(255,226,160,.85) 28%,rgba(255,218,150,.4) 60%,transparent 100%);-webkit-mask-image:conic-gradient(from -64deg at 50% 50%,transparent 0deg,rgba(0,0,0,.62) 10deg,rgba(0,0,0,.92) 24deg,#000 50deg,rgba(0,0,0,.95) 72deg,rgba(0,0,0,.8) 92deg,rgba(0,0,0,.3) 104deg,transparent 112deg);mask-image:conic-gradient(from -64deg at 50% 50%,transparent 0deg,rgba(0,0,0,.62) 10deg,rgba(0,0,0,.92) 24deg,#000 50deg,rgba(0,0,0,.95) 72deg,rgba(0,0,0,.8) 92deg,rgba(0,0,0,.3) 104deg,transparent 112deg)}
 #vig{position:absolute;inset:0;mix-blend-mode:multiply;transition:opacity .9s;
   background:linear-gradient(180deg,rgba(84,92,112,.56) 0,rgba(92,100,120,.5) calc(var(--ly,72%) - 1px),rgba(120,128,144,.4) calc(var(--ly,72%) + 3px),rgba(92,100,118,.5) calc(var(--ly,72%) + 60px),rgba(80,88,106,.56) 100%)}
-#vig::after{content:'';position:absolute;inset:0;opacity:.4;transition:opacity 1.2s ease;background:radial-gradient(ellipse 115% 105% at 50% 62%,rgba(255,255,255,0) 48%,rgba(70,76,92,.5) 82%,rgba(40,44,56,.85) 100%)}
+#vig::after{content:'';position:absolute;inset:0;opacity:.65;transition:opacity 1.2s ease;background:linear-gradient(90deg,rgba(36,40,52,.62) 0,rgba(60,66,80,.3) 14%,rgba(255,255,255,0) 30%,rgba(255,255,255,0) 70%,rgba(60,66,80,.3) 86%,rgba(36,40,52,.62) 100%),radial-gradient(ellipse 100% 95% at 50% 60%,rgba(255,255,255,0) 42%,rgba(64,70,86,.5) 76%,rgba(32,36,48,.88) 100%)}
 body.typing #vig::after{opacity:1}
 body:not(.night) #lamp:not(.x){box-shadow:0 0 16px 5px rgba(255,236,190,.55),0 1px 2px rgba(0,0,0,.3)}
 body:not(.lit) #glow{opacity:0}
